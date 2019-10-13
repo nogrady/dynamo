@@ -1,5 +1,7 @@
 # DynaMo: Dynamic Community Detection by Incrementally Maximizing Modularity
 
+- A preprint version of our paper: [https://arxiv.org/abs/1709.08350](https://arxiv.org/abs/1709.08350).
+
 - This is a sample code of our DynaMo paper, including all the necessary implementations for our experiments on the synthetic dynamic networks: 1) synthetic_exp_1.java: using the ground truth communities as the initial community structure; 2) synthetic_exp_2.java: using the result of static algorithm (i.e., Louvain) as the initial community structure.  
 
 - The necessary implementations for our experiments on the real-world dynamic networks is in real_world_network_exp.java. The real-world dynamic network datasets will be added soon.  
