@@ -1,0 +1,6 @@
+# Clusters: 2, Nodes:4,Fuzzy: 0, Numbered: 0
+# Note: 1lev4nds2cls matching with 1lev4nds3cls1s vs 1lev4nds3cls2 is an example
+# where standard novp NMI (not gecmi NMIovp) fails to evaluate overlapping
+# matching unlike F1.
+1 2
+3 4 2

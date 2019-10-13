@@ -32,13 +32,11 @@ public class GreMod{
 	}
 	
 	public HashMap increase(String incPath, int dataPoints, String commOutPath) throws Exception{
-		long t0_1 = System.currentTimeMillis();
 		HashMap resultMap = new HashMap();
 		HashMap<String, Integer> nodeDict = comm.nodeDict;
 		ArrayList<Double> modList = new ArrayList();
-		ArrayList<Long> timeList = new ArrayList();
+		ArrayList<Double> timeList = new ArrayList();
 		ArrayList<Integer> commList = new ArrayList();
-		long t0_2 = System.currentTimeMillis();
 		for(int i = 0; i < dataPoints; i++){
 			long t1 = System.currentTimeMillis();
 			int opType = 0;
@@ -175,16 +173,13 @@ public class GreMod{
 				str = br.readLine();
 			}
 			br.close();
-			
-			
+			long t2 = System.currentTimeMillis();
+			double time = (double)(t2-t1) / 1000;
+			System.out.println("Time pint: " + (i+1) + ": modularity: " + comm.modularity() + "  time: " + time + " seconds");
 			modList.add(new Double(Parameter.df.format(comm.modularity())));
-			
+			timeList.add(time);
 			commList.add(comm.communities());
 			comm.exportCommunity(FileUtil.extendFileName(commOutPath, "_" + (i+1)));
-			long t2 = System.currentTimeMillis();
-			long time = t2-t1+t0_2-t0_1;
-			System.out.println("Time pint: " + (i+1) + ": modularity: " + comm.modularity() + "  time: " + time + " seconds");
-			timeList.add(time);
 		}
 		resultMap.put("modList", modList);
 		resultMap.put("timeList", timeList);

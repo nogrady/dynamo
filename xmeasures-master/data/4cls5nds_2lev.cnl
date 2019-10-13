@@ -1,0 +1,14 @@
+# Clusters: 4, Nodes:, Fuzzy: 0, Numbered: 0
+1 2:0.2
+2:0.3 4
+5 2:0.3 3
+3
+# Lev 2
+1 2 4
+5 2 3
+
+# Cleared version:
+# 1 2		[Matches in 3cls5nds: 1+3=4]
+# 2 4		[3+1=4]
+# 5 2 3		[1+3+1=5]
+# 3			[1]

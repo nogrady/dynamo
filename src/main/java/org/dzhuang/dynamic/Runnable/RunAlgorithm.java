@@ -4,10 +4,7 @@
 package org.dzhuang.dynamic.Runnable;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,7 +25,7 @@ import toolbox.svm.SVM;
 public class RunAlgorithm {
 	
 	public static void main(String args[]) throws Exception{
-		/*ModularityOptimizer_Louvain.runLouvain("Cit-HepPh", 31);
+		ModularityOptimizer_Louvain.runLouvain("Cit-HepPh", 31);
 		ModularityOptimizer_Louvain.runLouvain("Cit-HepTh", 25);
 		ModularityOptimizer_Louvain.runLouvain("dblp_coauthorship", 31);
 		ModularityOptimizer_Louvain.runLouvain("facebook", 28);
@@ -40,14 +37,14 @@ public class RunAlgorithm {
 		ModularityOptimizer_DynaMo.runDynamicModularity("dblp_coauthorship", 31);
 		ModularityOptimizer_DynaMo.runDynamicModularity("facebook", 28);
 		ModularityOptimizer_DynaMo.runDynamicModularity("flickr", 24);
-		ModularityOptimizer_DynaMo.runDynamicModularity("youtube", 33);*/
+		ModularityOptimizer_DynaMo.runDynamicModularity("youtube", 33);
 		
-		runEXP("Cit-HepPh");
-		runEXP("Cit-HepTh");
-		runEXP("dblp_coauthorship");
-		runEXP("facebook");
-		runEXP("flickr");
-		runEXP("youtube");
+		runIncremental("Cit-HepPh");
+		runIncremental("Cit-HepTh");
+		runIncremental("dblp_coauthorship");
+		runIncremental("facebook");
+		runIncremental("flickr");
+		runIncremental("youtube");
 		
 		runLBTR("Cit-HepPh", 31);
 		runLBTR("Cit-HepTh", 25);
@@ -57,18 +54,18 @@ public class RunAlgorithm {
 		runLBTR("youtube", 33);
 	}
 	
-	public static void runEXP(String dataSet) throws Exception {
+	public static void runIncremental(String dataSet) throws Exception {
 		String graphPath="data2/"+dataSet+"/"+dataSet+"_graph_0.txt";
 		String initComPath="data2/"+dataSet+"/"+dataSet+"_com_0.txt";
 		String incPath="data2/"+dataSet+"/"+dataSet+"_inc.txt";
 		
 		runQCA(graphPath, initComPath, incPath, dataSet);
-		runBatchInc(graphPath, initComPath, incPath, dataSet);
+		runBatch(graphPath, initComPath, incPath, dataSet);
 		runGreMod(graphPath, initComPath, incPath, dataSet);
 	}
 	
 	public static void runGreMod(String graphPath, String initComPath, String incPath, String dataSet) throws Exception{
-		String comOutPath = FileUtil.replaceFileName(incPath, dataSet+"_GreMod_community.txt");
+		String comOutPath = FileUtil.replaceFileName(incPath, dataSet+"_GreMod_com.txt");
 		String tmpPath = "graph.tmp";
 		FileUtil.generateGraph(graphPath, tmpPath);
 		System.out.println("Running incremental algorithm GreMod...");
@@ -84,89 +81,43 @@ public class RunAlgorithm {
 		System.out.println("Modularity: " + modList);
 		System.out.println("Run time: " + timeList);
 		FileUtil.deleteFile(tmpPath);
-		
-		String resultPath = FileUtil.replaceFileName(initComPath, dataSet+"_GreMod_result.txt");
-		BufferedWriter bw = new BufferedWriter(new FileWriter(new File(resultPath)));
-		bw.write("Q=" + modList.toString() + ";\r\n");
-		bw.write("T=" + timeList.toString() + ";\r\n");
-		bw.close();
-		
-		PrintWriter pw=new PrintWriter(dataSet+"_modularity_runGreMod");
+		PrintWriter pw=new PrintWriter(dataSet+"_GreMod_Modularity_Time");
 		for(int i=0;i<modList.size();i++){
-			pw.println(modList.get(i)+"\t"+timeList.get(i)*1000);
+			pw.println(modList.get(i)+"\t"+(long)(timeList.get(i)*1000));
 		}
-		
 		pw.close();
 	}
 	
 	public static void runQCA(String graphPath, String initComPath, String incPath, String dataSet) throws Exception{
-		System.out.println("Running the QCA2 algorithm...");
+		System.out.println("Running the QCA algorithm...");
 		QCA  qca = new QCA();
 		qca.init(graphPath, initComPath, 0.0001);
 		double mod = qca.modularity();
 		System.out.println("Graph read! Nodes: " + qca.g.nbNodes + "  Links: " + qca.g.nbLinks/2);
         System.out.println("Community read! Communities: " + qca.nonEmptyCommunities() + "   Modularity: " + mod + "  hInc.cg.mod: ");
-        
-        String comOutPath = FileUtil.replaceFileName(initComPath, dataSet+"_QCA2_com.txt");
-  
-        long t1 = System.currentTimeMillis();
+        String comOutPath = FileUtil.replaceFileName(initComPath, dataSet+"_QCA_com.txt");
         HashMap resultMap = qca.increase(incPath, 10000, comOutPath);
-        long t2 = System.currentTimeMillis();
-        
 		ArrayList<Float> modList = (ArrayList<Float>) resultMap.get("modList");
 		ArrayList<Float> timeList = (ArrayList<Float>) resultMap.get("timeList");
-		ArrayList<Integer> comList = (ArrayList<Integer>)resultMap.get("comList");
-		
-		System.out.println("Q=" + modList + ";");
-		System.out.println("T=" + timeList + ";");
-		System.out.println("C=" + comList + ";");
-		
-		String resultPath = FileUtil.replaceFileName(initComPath, dataSet+"_QCA2_result.txt");
-		BufferedWriter bw = new BufferedWriter(new FileWriter(new File(resultPath)));
-		bw.write("Q=" + modList.toString() + ";\r\n");
-		bw.write("T=" + timeList.toString() + ";\r\n");
-		bw.write("C=" + comList.toString() + ";\r\n");
-		bw.close();
-		System.out.println("See results in File: " + resultPath);
-		PrintWriter pw=new PrintWriter(dataSet+"_modularity_runQCA2");
+		PrintWriter pw=new PrintWriter(dataSet+"_QCA_Modularity_Time");
 		for(int i=0;i<modList.size();i++){
-			pw.println(modList.get(i)+"\t"+timeList.get(i)*1000);
+			pw.println(modList.get(i)+"\t"+(long)(timeList.get(i)*1000));
 		}
-		
 		pw.close();
 	}
 	
-	public static void runBatchInc(String graphPath, String initComPath, String incPath, String dataSet) throws Exception{
-		System.out.println("Running the BatchInc2 algorithm...");
+	public static void runBatch(String graphPath, String initComPath, String incPath, String dataSet) throws Exception{
+		System.out.println("Running the Batch algorithm...");
 		BatchInc batchInc = new BatchInc();
 		batchInc.initialize(graphPath, initComPath);
-        
-        String comOutPath = FileUtil.replaceFileName(initComPath, dataSet+"_BatchInc2_com.txt");
-		
-		long t1 = System.currentTimeMillis();
+        String comOutPath = FileUtil.replaceFileName(initComPath, dataSet+"_Batch_com.txt");
 		HashMap resultMap = batchInc.increase(incPath, 10000, comOutPath);
-		long t2 = System.currentTimeMillis();
-		
 		ArrayList<Float> modList = (ArrayList<Float>) resultMap.get("modList");
 		ArrayList<Float> timeList = (ArrayList<Float>) resultMap.get("timeList");
-		ArrayList<Integer> comList = (ArrayList<Integer>)resultMap.get("comList");
-		
-		System.out.println("Q=" + modList + ";");
-		System.out.println("T=" + timeList + ";");
-		System.out.println("C=" + comList + ";");
-		
-		String resultPath = FileUtil.replaceFileName(initComPath, dataSet+"_BatchInc2_result.txt");
-		BufferedWriter bw = new BufferedWriter(new FileWriter(new File(resultPath)));
-		bw.write("Q=" + modList.toString() + ";\r\n");
-		bw.write("T=" + timeList.toString() + ";\r\n");
-		bw.write("C=" + comList.toString() + ";\r\n");
-		bw.close();
-		System.out.println("See results in File: " + resultPath);
-		PrintWriter pw=new PrintWriter(dataSet+"_modularity_runBatch2");
+		PrintWriter pw=new PrintWriter(dataSet+"_Batch_Modularity_Time");
 		for(int i=0;i<modList.size();i++){
-			pw.println(modList.get(i)+"\t"+timeList.get(i)*1000);
+		pw.println(modList.get(i)+"\t"+(long)(timeList.get(i)*1000));
 		}
-		
 		pw.close();
 	}
 	
@@ -179,7 +130,32 @@ public class RunAlgorithm {
 	
 	public static void trainSvmClassifiers(String dataSet, int size) throws Exception{
 		for(int i=0;i<size;i++){
-			BufferedReader br=new BufferedReader(new FileReader("data2/"+dataSet+"/"+dataSet+"_sample_init_"+i+".txt"));
+			String sample_init="data2/"+dataSet+"/"+dataSet+"_sample_init_"+i+".txt";
+			int cnt=i;
+			
+			boolean flag=true;
+			while(flag) {
+				BufferedReader br=new BufferedReader(new FileReader(sample_init));
+				String line="";
+				int n=0;
+				int p=0;
+				while ((line=br.readLine())!=null){
+					if(line.split("\t")[0].equals("0"))
+						n++;
+					else
+						p++;
+				}
+				br.close();
+				
+				if(n>0 && p>0) {
+					flag=false;
+				}
+				else {
+					sample_init="data2/"+dataSet+"/"+dataSet+"_sample_init_"+(--cnt)+".txt";
+				}
+			}
+			
+			BufferedReader br=new BufferedReader(new FileReader(sample_init));		
 			String line="";
 			int n=0;
 			int p=0;
@@ -192,7 +168,8 @@ public class RunAlgorithm {
 			br.close();
 			double n2p=(double) n/(double) p;
 			int maxSize=n+p < 10000 ? n+p : 10000;
-			String samplePath = "data2/"+dataSet+"/"+dataSet+"_sample_init_"+i+".txt";
+			String samplePath = sample_init;
+
 			String modelPath = "data2/"+dataSet+"/"+dataSet+"_model_SVM_"+i+".txt";
 			System.out.println("trainSvmClassifiers"+"\t"+dataSet+"\t"+i);
 			SVM.trainModel(samplePath, modelPath, n2p, maxSize);
@@ -201,7 +178,32 @@ public class RunAlgorithm {
 	
 	public static void trainLrClassifiers(String dataSet, int size) throws Exception{
 		for(int i=0;i<size;i++){
-			BufferedReader br=new BufferedReader(new FileReader("data2/"+dataSet+"/"+dataSet+"_sample_init_"+i+".txt"));
+			String sample_init="data2/"+dataSet+"/"+dataSet+"_sample_init_"+i+".txt";
+			int cnt=i;
+			
+			boolean flag=true;
+			while(flag) {
+				BufferedReader br=new BufferedReader(new FileReader(sample_init));
+				String line="";
+				int n=0;
+				int p=0;
+				while ((line=br.readLine())!=null){
+					if(line.split("\t")[0].equals("0"))
+						n++;
+					else
+						p++;
+				}
+				br.close();
+				
+				if(n>0 && p>0) {
+					flag=false;
+				}
+				else {
+					sample_init="data2/"+dataSet+"/"+dataSet+"_sample_init_"+(--cnt)+".txt";
+				}
+			}
+			
+			BufferedReader br=new BufferedReader(new FileReader(sample_init));
 			String line="";
 			int n=0;
 			int p=0;
@@ -216,7 +218,8 @@ public class RunAlgorithm {
 			int maxSize=n+p < 10000 ? n+p : 10000;
 			int paramNum=3;
 			double delta = 0.0001;
-			String samplePath="data2/"+dataSet+"/"+dataSet+"_sample_init_"+i+".txt";
+			String samplePath = sample_init;
+			
 			String paramPath="data2/"+dataSet+"/"+dataSet+"_param_LR_"+i+".txt";
 			
 			LogisticRegression lr = new LogisticRegression(paramNum, delta);
@@ -234,95 +237,51 @@ public class RunAlgorithm {
 		}	
 	}
 	
-	public static void runLearnIncSvm(String dataSet) throws Exception{
-//		long t1 = System.currentTimeMillis();
-		
+	public static void runLearnIncSvm(String dataSet) throws Exception{		
 		long t1_1 = System.currentTimeMillis();
 		String graphPath="data2/"+dataSet+"/"+dataSet+"_graph_0.txt";
 		String comPath="data2/"+dataSet+"/"+dataSet+"_com_0.txt";
 		String incPath="data2/"+dataSet+"/"+dataSet+"_inc.txt";
-    					
 		LearnIncSvm lInc = new LearnIncSvm();
 		lInc.init2(graphPath, comPath);
 		double mod = lInc.modularity();
 		System.out.println("Graph read! Nodes: " + lInc.g.nbNodes + "  Links: " + lInc.g.nbLinks/2);
         System.out.println("Community read! Communities: " + lInc.nonEmptyCommunities() + "   Modularity: " + mod);
-        
         lInc.MAX_MERGE_SIZE=20;
         long t1_2 = System.currentTimeMillis();
         HashMap resultMap = lInc.increaseNoComOutput(incPath, 10000, dataSet);
         long t2_1 = System.currentTimeMillis();
 		ArrayList<Double> modList = (ArrayList<Double>) resultMap.get("modList");
 		ArrayList<Long> timeList = (ArrayList<Long>) resultMap.get("timeList");
-//		ArrayList<Integer> comList = (ArrayList<Integer>)resultMap.get("comList");
-		
-//		System.out.println("Q=" + modList + ";");
-//		System.out.println("T=" + timeList + ";");
-//		System.out.println("C=" + comList + ";");
-		
-//		String resultPath = "data2/"+dataSet+"/"+dataSet+"_result_LearnIncSVM.txt";
-//		BufferedWriter bw = new BufferedWriter(new FileWriter(new File(resultPath)));
-//		bw.write("Q=" + modList.toString() + ";\r\n");
-//		bw.write("T=" + timeList.toString() + ";\r\n");
-//		bw.write("C=" + comList.toString() + ";\r\n");
-//		bw.close();
-		
-//		long t2 = System.currentTimeMillis();
-//		System.out.println("Time: " + (t2-t1));
 		long t2_2 = System.currentTimeMillis();
-		
-		PrintWriter pw=new PrintWriter(dataSet+"_modularity_runLearnIncSvm");
+		PrintWriter pw=new PrintWriter(dataSet+"_LBTR-SVM_Modularity_Time");
 		for(int i=0;i<modList.size();i++){
 			pw.println(modList.get(i)+"\t"+(timeList.get(i)+t1_2-t1_1+t2_2-t2_1));
 		}
-		
 		pw.close();
-    	
 	}
 	
 	public static void runLearnIncLr(String dataSet) throws Exception{
-//		long t1 = System.currentTimeMillis();
-		
 		long t1_1 = System.currentTimeMillis();
     	String graphPath ="data2/"+dataSet+"/"+dataSet+"_graph_0.txt";
     	String incPath = "data2/"+dataSet+"/"+dataSet+"_inc.txt";
     	String initComPath = "data2/"+dataSet+"/"+dataSet+"_com_0.txt";
-		
 		LearnIncLr lInc = new LearnIncLr();
 		lInc.init2(graphPath, initComPath);
 		double mod = lInc.modularity();
 		System.out.println("Graph read! Nodes: " + lInc.g.nbNodes + "  Links: " + lInc.g.nbLinks/2);
         System.out.println("Community read! Communities: " + lInc.nonEmptyCommunities() + "   Modularity: " + mod);
-
         lInc.MAX_MERGE_SIZE=20;
-        
         long t1_2 = System.currentTimeMillis();
         HashMap resultMap = lInc.increaseNoComOutput(incPath, 10000, dataSet);
         long t2_1 = System.currentTimeMillis();
-        
 		ArrayList<Double> modList = (ArrayList<Double>) resultMap.get("modList");
 		ArrayList<Long> timeList = (ArrayList<Long>) resultMap.get("timeList");
-//		ArrayList<Integer> comList = (ArrayList<Integer>)resultMap.get("comList");
-		
-//		System.out.println("Q=" + modList + ";");
-//		System.out.println("T=" + timeList + ";");
-//		System.out.println("C=" + comList + ";");
-		
-//		String resultPath = "data2/"+dataSet+"/"+dataSet+"_result_LearnIncLR.txt";
-//		BufferedWriter bw = new BufferedWriter(new FileWriter(new File(resultPath)));
-//		bw.write("Q=" + modList.toString() + ";\r\n");
-//		bw.write("T=" + timeList.toString() + ";\r\n");
-//		bw.write("C=" + comList.toString() + ";\r\n");
-//		bw.close();
-//		long t2 = System.currentTimeMillis();
-//		System.out.println("Time: " + (t2-t1));
 		long t2_2 = System.currentTimeMillis();
-		
-		PrintWriter pw=new PrintWriter(dataSet+"_modularity_runLearnIncLr");
+		PrintWriter pw=new PrintWriter(dataSet+"_LBTR-LR_Modularity_Time");
 		for(int i=0;i<modList.size();i++){
 			pw.println(modList.get(i)+"\t"+(timeList.get(i)+t1_2-t1_1+t2_2-t2_1));
 		}
-		
 		pw.close();
 	}
 }

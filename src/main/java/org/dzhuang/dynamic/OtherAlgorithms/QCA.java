@@ -44,13 +44,11 @@ public class QCA {
 	}
 	
 	public HashMap increase(String incPath, int maxPoints, String commOutPath) throws Exception{
-		long t0_1 = System.currentTimeMillis();
 		HashMap resultMap = new HashMap();
 		HashMap<String, Integer> nodeDict = g.nodeDict;
-		ArrayList<Double> modList = new ArrayList();
-		ArrayList<Long> timeList = new ArrayList();
+		ArrayList<Float> modList = new ArrayList();
+		ArrayList<Float> timeList = new ArrayList();
 		ArrayList<Integer> comList = new ArrayList();
-		long t0_2 = System.currentTimeMillis();
 		for(int point = 0; point < maxPoints; point++){
 			long t1 = System.currentTimeMillis();
 			File incFile = new File(FileUtil.extendFileName(incPath, "_" + (point+1)));
@@ -65,15 +63,15 @@ public class QCA {
 					continue;
 				updateCommunityStructure(deltaG);
 			}
+			long t2= System.currentTimeMillis();
 			double mod = modularity();
+			float time = (float)(t2-t1)/1000;
 			int communities = nonEmptyCommunities();
 			this.writeCommunity(FileUtil.extendFileName(commOutPath, "_" + (point+1)));
-			modList.add(mod);
-			comList.add(communities);
-			long t2= System.currentTimeMillis();
-			long time = t2-t1+t0_2-t0_1;
-			System.out.println("Q" + point + ": " + mod + "   Time: " + time + "   Communities: " + communities);
+			modList.add((float)mod);
 			timeList.add(time);
+			comList.add(communities);
+			System.out.println("Q" + point + ": " + (float)mod + "   Time: " + time + "   Communities: " + communities);
 			//outputCommunityStatistics();
 		}
 		resultMap.put("modList", modList);

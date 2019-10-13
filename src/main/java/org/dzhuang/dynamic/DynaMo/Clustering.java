@@ -20,8 +20,8 @@ public class Clustering implements Cloneable, Serializable{
     private static final long serialVersionUID = 1;
 
     protected int nNodes;
-    public int nClusters;
-    public int[] cluster;
+    protected int nClusters;
+    protected int[] cluster;
 
     public static Clustering load(String fileName) throws ClassNotFoundException, IOException{
         Clustering clustering;
@@ -54,8 +54,6 @@ public class Clustering implements Cloneable, Serializable{
         try{
             clonedClustering = (Clustering)super.clone();
             clonedClustering.cluster = getClusters();
-            clonedClustering.nNodes=this.nNodes;
-            clonedClustering.nClusters=this.nClusters;
             return clonedClustering;
         }
         catch (CloneNotSupportedException e){

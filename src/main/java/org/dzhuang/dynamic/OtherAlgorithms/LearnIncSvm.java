@@ -99,13 +99,11 @@ public class LearnIncSvm {
 	}
 	
 	public HashMap increaseNoComOutput(String incPath, int maxPoints, String dataSet) throws Exception{
-		long t0_1 = System.currentTimeMillis();
 		HashMap resultMap = new HashMap();
 		HashMap<String, Integer> nodeDict = g.nodeDict;
 		ArrayList<Double> modList = new ArrayList();
 		ArrayList<Long> timeList = new ArrayList();
 		ArrayList<Integer> comList = new ArrayList();
-		long t0_2 = System.currentTimeMillis();
 		for(int point = 0; point < maxPoints; point++){
 			long t1 = System.currentTimeMillis();
 			File incFile = new File(FileUtil.extendFileName(incPath, "_" + (point+1)));
@@ -131,7 +129,7 @@ public class LearnIncSvm {
 			this.writeCommunity("data2/"+dataSet+"/"+dataSet+"_LearnIncSVM_community_"+(point+1)+".txt");
 			FileUtil.deleteFile(tmpComPath);
 			long t2= System.currentTimeMillis();
-			long time = t2-t1+t0_2-t0_1;
+			long time = t2-t1;	
 			timeList.add(time);
 			System.out.println("Q" + (point+1) + ": " + mod + "   Time: " + time + "   Communities: " + communities);
 			//outputCommunityStatistics();

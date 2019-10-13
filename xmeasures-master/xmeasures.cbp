@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="xmeasures" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/xmeasures" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-Wredundant-decls" />
+					<Add option="-Winline" />
+					<Add option="-Wswitch-default" />
+					<Add option="-Wmain" />
+					<Add option="-Wall" />
+					<Add option="-g" />
+					<Add option="-DDEBUG" />
+					<Add option="-D_GLIBCXX_DEBUG" />
+					<Add option="-DTRACE=2" />
+					<Add option="-DVALIDATE=2" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/xmeasures" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-march=core2" />
+					<Add option="-fomit-frame-pointer" />
+					<Add option="-O3" />
+					<Add option="-DTRACE=1" />
+					<Add option="-DVALIDATE=1" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wnon-virtual-dtor" />
+			<Add option="-Winit-self" />
+			<Add option="-Wcast-align" />
+			<Add option="-Wundef" />
+			<Add option="-Wfloat-equal" />
+			<Add option="-Wunreachable-code" />
+			<Add option="-Wmissing-include-dirs" />
+			<Add option="-Weffc++" />
+			<Add option="-Wzero-as-null-pointer-constant" />
+			<Add option="-std=c++14" />
+			<Add option="-fexceptions" />
+			<Add option="-fstack-protector-strong" />
+			<Add option="-Wno-float-equal" />
+			<Add option="-D_FORTIFY_SOURCE=2" />
+			<Add directory="include" />
+			<Add directory="autogen" />
+			<Add directory="shared" />
+		</Compiler>
+		<Linker>
+			<Add library="stdc++fs" />
+		</Linker>
+		<Unit filename="autogen/cmdline.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="autogen/cmdline.h" />
+		<Unit filename="include/interface.h" />
+		<Unit filename="include/interface.hpp" />
+		<Unit filename="shared/agghash.hpp" />
+		<Unit filename="shared/fileio.cpp" />
+		<Unit filename="shared/fileio.hpp" />
+		<Unit filename="shared/macrodef.h" />
+		<Unit filename="shared/operations.hpp" />
+		<Unit filename="src/interface.cpp" />
+		<Unit filename="src/main.cpp" />
+		<Extensions>
+			<DoxyBlocks>
+				<comment_style block="1" line="1" />
+				<doxyfile_project />
+				<doxyfile_build />
+				<doxyfile_warnings />
+				<doxyfile_output />
+				<doxyfile_dot />
+				<general />
+			</DoxyBlocks>
+			<code_completion />
+			<envvars />
+			<lib_finder disable_auto="1" />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

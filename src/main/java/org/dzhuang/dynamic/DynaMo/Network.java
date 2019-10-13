@@ -21,12 +21,12 @@ public class Network implements Serializable{
     private static final long serialVersionUID = 1;
     
     public double totalEdgeWeight;
-    public int nNodes;
+    protected int nNodes;
     protected int nEdges;
     protected double[] nodeWeight;
-    public int[] firstNeighborIndex;
-    public int[] neighbor;
-    public double[] edgeWeight;
+    protected int[] firstNeighborIndex;
+    protected int[] neighbor;
+    protected double[] edgeWeight;
     public double totalEdgeWeightSelfLinks;
 
     public static Network load(String fileName) throws ClassNotFoundException, IOException{

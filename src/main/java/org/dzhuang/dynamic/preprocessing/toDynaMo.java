@@ -12,72 +12,14 @@ import java.util.HashSet;
 import org.dzhuang.dynamic.DynaMo.Network;
 import org.dzhuang.dynamic.util.FileUtil;
 
-
 public class toDynaMo {
 	public static void main(String[] args) throws IOException, ClassNotFoundException {	
-//		run("Cit-HepPh", 31);
-//		run("Cit-HepTh", 25);
-//		run("dblp_coauthorship", 31);
-//		run("facebook", 28);
-//		run("flickr", 24);
-//		run("youtube", 33);
-		
-//		run2("networks_us-101", 3991);
-//		run2("networks_i-80", 3991);
-//		run2("networks_lankershim", 3991);
-//		run2("networks_peachtree", 3991);
-		
-//		for(int i=3990;i>=0;i--) {
-//			File f1 = new File("/home/durham314/eclipse-workspace/dynamic/data/networks_peachtree/ntwk/"+i);
-//			File f2 = new File("/home/durham314/eclipse-workspace/dynamic/data/networks_peachtree/ntwk/"+(i+1));
-//			f1.renameTo(f2);
-//		}
-		
-	}
-	
-	public static void run2(String dataSet, int size) throws IOException{
-		FileUtil.deleteDir(new File("data/"+dataSet+"/inct"));
-		(new File("data/"+dataSet+"/inct")).mkdir();
-		FileUtil.deleteDir(new File("data/"+dataSet+"/ntwk2"));
-		(new File("data/"+dataSet+"/ntwk2")).mkdir();
-		
-		for(int i=0;i<=size-1;i++) {
-			Network network = readInputFile("data/"+dataSet+"/ntwk/"+i);
-			network.save("data/"+dataSet+"/ntwk2/"+(i+1));
-		}
-		for(int i=1;i<=size-1;i++){
-			HashSet<String> oldNetwork=new HashSet<String>();
-			HashSet<String> newNetwork=new HashSet<String>();
-			BufferedReader bufferedReader = new BufferedReader(new FileReader("data/"+dataSet+"/ntwk/"+(i)));
-			String line="";
-			while ((line=bufferedReader.readLine()) != null) {
-				newNetwork.add(line);
-			}
-			bufferedReader.close();
-			
-			int cnt=0;
-			PrintWriter pw=new PrintWriter("data/"+dataSet+"/inct/"+(i+1));
-			bufferedReader = new BufferedReader(new FileReader("data/"+dataSet+"/ntwk/"+(i-1)));
-			line="";
-			while ((line=bufferedReader.readLine()) != null) {
-				oldNetwork.add(line);
-				if(!newNetwork.contains(line))
-					pw.println(cnt+"\t"+"-"+"\t"+line);				
-				cnt++;
-			}
-			bufferedReader.close();
-			
-			cnt=0;
-			bufferedReader = new BufferedReader(new FileReader("data/"+dataSet+"/ntwk/"+(i)));
-			line="";
-			while ((line=bufferedReader.readLine()) != null) {				
-				if(!oldNetwork.contains(line))		
-					pw.println(cnt+"\t"+"+"+"\t"+line);
-				cnt++;
-			}
-			bufferedReader.close();
-			pw.close();
-		}
+		run("Cit-HepPh", 31);
+		run("Cit-HepTh", 25);
+		run("dblp_coauthorship", 31);
+		run("facebook", 28);
+		run("flickr", 24);
+		run("youtube", 33);	
 	}
 	
 	public static void run(String dataSet, int size) throws IOException{
@@ -90,6 +32,7 @@ public class toDynaMo {
 			Network network = readInputFile("data/"+dataSet+"/ntwk/"+i);
 			network.save("data/"+dataSet+"/ntwk2/"+i);
 		}
+		
 		for(int i=2;i<=size;i++){
 			HashSet<String> oldNetwork=new HashSet<String>();
 			HashSet<String> newNetwork=new HashSet<String>();

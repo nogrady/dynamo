@@ -8,34 +8,22 @@ import java.util.Random;
 
 public class ModularityOptimizer_Louvain{
 	public static double resolution_default=1.0;
-	public static int nRandomStarts_default=10;
+	public static int nRandomStarts_default=10; //1000;
 	public static int nIterations_default=10000;
 	public static long randomSeed_default=0;
 
 	public static void main(String[] args) throws IOException, ClassNotFoundException{		
-//		runLouvain("Cit-HepPh", 31);
-//		runLouvain("Cit-HepTh", 25);
-//		runLouvain("dblp_coauthorship", 31);
-//		runLouvain("facebook", 28);
-//		runLouvain("flickr", 24);
-//		runLouvain("youtube", 33);
-		
-//		runLouvain("networks_us-101", 3991);
-//		runLouvain("networks_i-80", 3991);
-//		runLouvain("networks_lankershim", 3991);
-//		runLouvain("networks_peachtree", 3991);	
-		
-//		runLouvain("networks_us-101", 1000);
-//		runLouvain("networks_i-80", 1000);
-//		runLouvain("networks_lankershim", 1000);
-//		runLouvain("networks_peachtree", 1000);	
-		
+		runLouvain("Cit-HepPh", 31);
+		runLouvain("Cit-HepTh", 25);
+		runLouvain("dblp_coauthorship", 31);
+		runLouvain("facebook", 28);
+		runLouvain("flickr", 24);
 		runLouvain("youtube", 33);
     }
 	
 	public static void runLouvain(String dataSet, int nbatch) throws IOException, ClassNotFoundException{
 		String DyNet="data/"+dataSet+"/ntwk2/";
-		PrintWriter pw=new PrintWriter(dataSet+"_modularity_runLouvain");
+		PrintWriter pw=new PrintWriter(dataSet+"_Louvain_Modularity_Time");
 		for(int ibatch=1;ibatch<=nbatch;ibatch++){
 	        Network network = Network.load(DyNet+ibatch);
 	        Clustering clustering = null;
@@ -61,11 +49,12 @@ public class ModularityOptimizer_Louvain{
 	        }
 	        long t2=System.currentTimeMillis();
 	        /***************************************************************************/
-	        writeOutputFile("data/"+dataSet+"/runLouvain_"+dataSet+"_com_"+(ibatch+1), clustering);
+//	        writeOutputFile("data/"+dataSet+"/runLouvain_"+dataSet+"_com_"+(ibatch+1), clustering);
+	        writeOutputFile("data/"+dataSet+"/runLouvain_"+dataSet+"_com_"+ibatch, clustering);
 	        
-	        System.out.println(dataSet+"\t"+"runLouvain"+"\t"+ibatch+"\t"+maxModularity+"\t"+(t2-t1));
+	        System.out.println(dataSet+"\t"+"Louvain"+"\t"+ibatch+"\t"+maxModularity+"\t"+(t2-t1));
 	        if(ibatch>1)
-	        	pw.println(ibatch+"\t"+maxModularity+"\t"+(t2-t1));
+	        	pw.println(maxModularity+"\t"+(t2-t1));
 		}
 		pw.close();
 	}

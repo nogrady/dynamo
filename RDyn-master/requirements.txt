@@ -1,0 +1,4 @@
+future==0.17.1
+networkx==2.2
+tqdm==4.28.1
+six==1.12.0

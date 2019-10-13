@@ -1,0 +1,11 @@
+# Clusters: 0, Nodes:5,Fuzzy: 0, Numbered: 0
+# Multilevel flattened collection
+# First level
+1 2 3
+4
+5
+# Second level
+1 2 3
+4 5
+# Third level
+1 2 3 4 5

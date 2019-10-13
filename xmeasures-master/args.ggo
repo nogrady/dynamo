@@ -1,0 +1,211 @@
+# Configuration file for the automatic generation of the input options parsing
+
+package "xmeasures"
+version "4.0.4"
+versiontext "Author:  (c) Artem Lutov <artem@exascale.info>
+Sources:  https://github.com/eXascaleInfolab/xmeasures
+Paper: \"Accuracy Evaluation of Overlapping and Multi-resolution Clustering Algorithms on Large Datasets\" by Artem Lutov, Mourad Khayati and Philippe Cudré-Mauroux, BigComp 2019
+"
+
+purpose "Extrinsic measures evaluation: Omega Index (a fuzzy version of the\
+ Adjusted Rand Index, identical to the Fuzzy Rand Index) and [mean] F1-score\
+ (prob, harm and avg) for the overlapping multi-resolution clusterings,\
+ and standard NMI for the non-overlapping clustering on a single resolution.\
+ Unequal node base is allowed in the evaluating clusterings and optionally can\
+ be synchronized removing nodes from the clusters missed in one of the clusterings (collections)."
+
+usage "xmeasures [OPTIONS] clustering1 clustering2
+
+  clustering  - input file, collection of the clusters to be evaluated.
+  
+Examples:
+  $ ./xmeasures -fp -kc networks/5K25.cnl tests/5K25_l0.825/5K25_l0.825_796.cnl
+  $ ./xmeasures -fh -kc -i tests/5K25.cll -ph -l networks/5K25.cnl tests/5K25_l0.825/5K25_l0.825_796.cnl
+  $ ./xmeasures -ox tests/clsevalsx/omega_c4.3-1.cnl tests/clsevalsx/omega_c4.3-2.cnl
+"
+
+description "Extrinsic measures are evaluated, i.e. two input clusterings\
+ (collections of clusters) are compared to each other. Optionally, a labeling\
+ of the evaluating clusters with the specified ground-truth clusters is performed.
+NOTE:
+  - Multiple evaluating measures can be specified.
+  - Each cluster should contain unique members, which is ensured only if the\
+ 'unique' option is specified.
+  - All clusters should be unique to not affect Omega Index evaluation, which\
+  can be ensured by the [resmerge](https://github.com/eXascaleInfolab/resmerge) utility.
+  - Non-corrected unequal node base in the clusterings is allowed, it penalizes the match.\
+Use [OvpNMI](https://github.com/eXascaleInfolab/OvpNMI) or\
+ [GenConvNMI](https://github.com/eXascaleInfolab/GenConvNMI) for NMI evaluation\
+ in the arbitrary collections (still each cluster should contain unique members).
+
+Evaluating measures are:
+  - OI  - Omega Index (a fuzzy version of the Adjusted Rand Index, identical to\
+  the Fuzzy Rand Index), which yields the same value as Adjusted Rand Index when\
+  applied to the non-overlapping clusterings.
+  - [M]F1  - various [mean] F1 measures of the Greatest (Max) Match including\
+  the Average F1-Score (suggested by J. Leskovec) with the optional weighting.
+NOTE: There are 3 matching policies available for each kind of F1. The most\
+  representative evaluation is performed by the F1p with combined matching\
+  policy (considers both micro and macro weighting).
+  - NMI  - Normalized Mutual Information, normalized by either max or also sqrt,\
+ avg and min information content denominators.
+ATTENTION: This is a standard NMI, which should be used ONLY for the HARD\
+ partitioning evaluation (non-overlapping clustering on a single resolution).\
+  It penalizes overlapping and multi-resolution structures.
+"
+
+option  "ovp" O  "evaluate overlapping instead of the multi-resolution clusters,\
+ where max matching for any shared member between R overlapping clusters is 1/R\
+ (the member is shared) instead of 1 (the member fully belongs to each [hierarchical\
+  sub]group) for the member belonging to R distinct clusters on R resolutions.
+NOTE: It has no effect for the Omega Index evaluation."
+  flag off
+#NOTE: Multi-resolution mode can be used as approximation of the overlapping\
+# clusters evaluation, but not vice verse"  flag off
+# Note: ovp option requires shares evaluation/reading and processing of the directory
+# of collections in case of both multi-resolution and overlapping  clustering evaluation
+option  "unique" q  "ensure on loading that all cluster members are unique by\
+ removing all duplicates."
+  flag off
+option  "sync" s  "synchronize with the specified node base omitting the non-matching nodes.
+NOTE: The node base can be either a separate, or an evaluating CNL file, in the\
+ latter case this option should precede the evaluating filename not repeating it"
+  string  typestr="filename"
+option  "membership" m  "average expected membership of the nodes in the clusters,\
+ > 0, typically >= 1. Used only to facilitate estimation of the nodes number on\
+ the containers preallocation if this number is not specified in the file header."
+  float default="1"
+option  "detailed" d  "detailed (verbose) results output"  flag off
+
+section "Omega Index"
+option  "omega" o  "evaluate Omega Index (a fuzzy version of the Adjusted Rand Index,\
+ identical to the Fuzzy Rand Index and on the non-overlapping clusterings equals to ARI)."
+  flag off
+option  "extended" x  "evaluate extended (Soft) Omega Index, which does not excessively\
+ penalize distinctly shared nodes."  flag off  dependon="omega"
+
+section "Mean F1"
+option  "f1" f  "evaluate mean F1 of the [weighted] average of the greatest (maximal)\
+ match by F1 or partial probability.
+NOTE: F1h <= F1a, where:
+ - p (F1p or Ph)  - Harmonic mean (F1) of two [weighted] averages of the Partial Probabilities,\
+ the most indicative as satisfies the largest number of the Formal Constraints\
+ (homogeneity, completeness and size/quantity except the rag bag in some cases);
+ - h (F1h)  - Harmonic mean (F1) of two [weighted] averages of all local F1\
+ (harmonic means of the Precision and Recall of the best matches of the clusters);
+ - a (F1a)  - Arithmetic mean (average) of two [weighted] averages of all local F1,\
+ the least discriminative and satisfies the lowest number of the Formal Constraints.
+Precision and recall are evaluated relative to the FIRST clustering dataset (ground-truth, gold standard).
+"
+ values="partprob","harmonic","average"  enum  default="partprob"  argoptional
+option  "kind" k  "kind of the matching policy:
+ - w  - Weighted by the number of nodes in each cluster (known as micro weighting, MF1_micro)
+ - u  - Unweighed, where each cluster is treated equally (known as macro weighting, MF1_macro)
+ - c  - Combined(w, u) using geometric mean (drops the value not so much as harmonic mean)
+"
+  values ="weighted","unweighed","combined"  enum default="weighted" argoptional
+  dependon="f1"
+
+section "Clusters Labeling & F1 evaluation with Precision and Recall"
+option  "label" l  "label evaluating clusters with the specified ground-truth (gt)\
+ cluster indices and evaluate F1 (including Precision and Recall) of the (best) MATCHED\
+ labeled clusters only (without the probable subclusters).
+NOTE: If 'sync' option is specified then the file name of the clusters labels\
+ should be the same as the node base (if specified) and should be in the .cnl format.\
+ The file name can be either a separate or an evaluating CNL file, in the\
+ latter case this option should precede the evaluating filename not repeating it.
+Precision and recall are evaluated relative to the FIRST clustering dataset (ground-truth, gold standard).
+"
+  string  typestr="gt_filename"
+option  "policy" p  "Labels matching policy:
+ - p  - Partial Probabilities (maximizes gain)
+ - h  - Harmonic Mean (minimizes loss, maximizes F1)
+"
+ values="partprob","harmonic"  enum  default="harmonic"  argoptional  dependon="label"
+option  "unweighted" u  "Labels weighting policy on F1 evaluation: weighted by the number\
+ of instances in each label by default (micro weighting, F1_micro) or unweighed,\
+ where each label is treated equally (i.e. macro weighting, F1_macro)"
+  flag off  dependon="label"
+option  "identifiers" i  "output labels (identifiers) of the evaluating clusters\
+ as lines of space-separated indices of the ground-truth clusters (.cll - clusters\
+ labels list)
+NOTE: If 'sync' option is specified then the reduced collection is outputted to the\
+ <labels_filename>.cnl besides the <labels_filename>
+"  string  typestr="labels_filename"  dependon="label"
+
+section "NMI"
+option  "nmi" n  "evaluate NMI (Normalized Mutual Information), applicable only\
+ to the non-overlapping clusters"  flag off
+option  "all" a  "evaluate all NMIs using sqrt, avg and min denominators besides\
+ the max one"  flag off  dependon="nmi"
+option  "ln" e  "use ln (exp base) instead of log2 (Shannon entropy, bits)\
+ for the information measuring" flag off  dependon="nmi"
+# Note: log2 vs ln have no any influence on the resulting value
+
+# Set optional options by default, allow input files to be unnamed parameters
+args "--default-optional --unamed-opts=clusterings"
+#args "--unamed-opts=clusterings"   # Allow input files to be unnamed parameters
+
+
+# = Changelog =
+# v4.0.4 - Precision and recall added to the MF1 output, mixed Prc, Rec in F1 fixed
+# v4.0.3 - Renamed F1s -> F1a to be synced with the paper, description refined
+# v4.0.2 - Description and output measures notations refined
+# v4.0.1 - Aggregated output for multiple measures added
+# v4.0.0 - Omega index added and bound to the "-o" argument
+#	- the former "-o" argument (overlaps) renamed to "-O"
+#	- F1s renamed to F1a (average), option "-s" renamed to "-a"
+# v3.2.2 - F1 weighting considered for the labels
+# v3.2.1 - Interpretation of F1p modified to have semantic of geometric mean, now F1h < F1p < F1s
+# v3.2.0 - Clusters labeling, labels F1 (with precision and recall) evaluation
+# v3.1.0 - Matching policy for the F measures parameterized (weighted, unweighted, combined)
+# v3.0.2 - NMI_sqrt added
+# v3.0 - Command line interface changed for F1
+#	- Standard F1-Score added
+#	- Option for the detailed results output added
+# v2.3 - Node base synchronization added
+# v2.2 - Input arguments redesigned
+# v2.1 - F1 of partial probabilities implemented besides F1 of f1s
+# v2.0 - Standard NMI implemented and evaluation base parameterized (exp, 2)
+# v1.1 - Weighted F1 implemented
+# v1.0 - Initial Release
+
+#TODO:
+# NF1 measure
+
+
+# Basic structure, see https://www.gnu.org/software/gengetopt/gengetopt.html#Basic-Usage
+#     package "<packname>"
+#     version "<version>"
+#     purpose "<purpose>"
+#     usage "<usage>"
+#     description "<description>"
+#     versiontext "<versiontext>"
+#
+#     args "<command line options>"
+#
+#     option <long> <short> "<desc>"
+#         {details="<detailed description>"}
+#         {argtype} {typestr="<type descr>"}
+#         {values="<value1>","<value2>",...}
+#         {default="<default value>"}
+#         {dependon="<other option>"}
+#         {required} {argoptional} {multiple}
+#         {hidden}
+#
+#     option <long> <short> "<desc>" flag <on/off>
+#
+#     section "section name" {sectiondesc="optional section description"}
+#
+#     text "a textual sentence"
+#
+#
+# Mutually exclusive options should belong to a group:
+#
+#     defgroup "<group name>" {groupdesc="<group description>"} {required}
+#     groupoption <long> <short> "<desc>" <argtype> group="<group name>" \
+#          {argoptional} {multiple}
+#
+#     defgroup "my grp2"
+#     defgroup "grp1" groupdesc="an option of this group is required" required
+#     groupoption "opta" a "string a" group="grp1" multiple

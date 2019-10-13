@@ -44,17 +44,14 @@ public class BatchInc {
 	}
 	
 	public HashMap increase(String incPath, int dataPoints, String commOutPath) throws Exception{
-		long t0_1 = System.currentTimeMillis();
 		HashMap<String, Integer> nodeDict = g0.nodeDict;
 		HashMap resultMap = new HashMap();
-		ArrayList<Double> modList = new ArrayList();
-		ArrayList<Long> timeList = new ArrayList();
+		ArrayList<Float> modList = new ArrayList();
+		ArrayList<Float> timeList = new ArrayList();
 		ArrayList<Integer> comList = new ArrayList();
-		long t0_2 = System.currentTimeMillis();
 		for(int i = 0; i < dataPoints; i++){
-			long t1 = System.currentTimeMillis();
 			System.out.println("Running: " + i);
-			
+			long t1 = System.currentTimeMillis();
 			File incFile = new File(FileUtil.extendFileName(incPath, "_" + (i+1)));
 			String commPath = FileUtil.extendFileName(commOutPath, "_" + (i+1));
 			if(!incFile.exists())
@@ -65,15 +62,13 @@ public class BatchInc {
 			HashMap<Integer, CommNode> commStruc = new HashMap();  //the hierarchical community structure
 			
 			Louvain louvain = new Louvain().runAndExport(g, g0.n2c, nodeDict, comMap, commStruc, 0.001);  // run the Louvain algorithm on the network
-			
-			g0.updateAndWriteCommunity(commStruc, commPath);
-			modList.add(new Double(Parameter.df.format(louvain.modularity())));
-			
-			comList.add(g0.commSizeMap.size());
 			long t2 = System.currentTimeMillis();
-			long time = t2-t1+t0_2-t0_1;
-			timeList.add(time);
-			System.out.println("Q" + (i+1) + ": " + louvain.modularity() + "   Time: " + time 
+			double time = (double)(t2-t1) / 1000;
+			g0.updateAndWriteCommunity(commStruc, commPath);
+			modList.add(new Float(Parameter.df.format(louvain.modularity())));
+			timeList.add((float)time);
+			comList.add(g0.commSizeMap.size());
+			System.out.println("Q" + (i+1) + ": " + (float)louvain.modularity() + "   Time: " + time 
 					+ "   Communities: " + g0.commSizeMap.size());
 		}
 		resultMap.put("modList", modList);

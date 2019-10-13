@@ -1,0 +1,11 @@
+# Clusters: 3	 Nodes:5,Fuzzy: 1, Numbered: 1
+# Note that the number of clusters corresponds to the number of payload lines in the file
+0> 1 2:0.2 3:1
+# Empty lines and comments are allowed
+1> 2:0.3 4
+2> 5 2:0.3
+
+# Cleared version:
+# 1 2 3		[Mathces in 4cls6nds: 1+3+2=6]
+# 2 4		[3+1=4]
+# 5 2		[1+3=4]
