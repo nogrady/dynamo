@@ -22,4 +22,4 @@
 
 
 
-Contact info: zhuangdi1990@gmail.com
+Contact info: Di Zhuang - ‬zhuangdi1990@gmail.com
