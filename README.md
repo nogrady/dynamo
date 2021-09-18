@@ -18,7 +18,7 @@
 - Go to the folder ./xmeasures-master and build xmeasures using ```make release```.
 - If you are using Python 2.7, nothing need to be changed. If you are using Python 3.XX, changing ``python RDyn-master/rdyn`` in synthetic_exp_1.java and synthetic_exp_2.java to ``python3 RDyn-master/rdyn``.
 - Run synthetic_exp_1.java and synthetic_exp_2.java for the synthetic dynamic network experiments.
-- Run real_world_network_exp.java for the real-world dynamic network experiments. ([datasets]([https://www.kaggle.com/nogrady/realworld-dynamic-networks-dynamo]))
+- Run real_world_network_exp.java for the real-world dynamic network experiments. [download the dataset:] ([https://www.kaggle.com/nogrady/realworld-dynamic-networks-dynamo](https://www.kaggle.com/nogrady/realworld-dynamic-networks-dynamo))  
 
 
 
