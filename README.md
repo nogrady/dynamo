@@ -7,9 +7,9 @@
 - The necessary implementations for our experiments on the real-world dynamic networks is in real_world_network_exp.java. The real-world dynamic network datasets will be added soon.  
 
 #### Requirements
-- We use RDyn to generate the synthetic dynamic networks. [RDyn: graph benchmark handling community dynamics.] ([https://github.com/GiulioRossetti/RDyn/blob/master/README.md](https://github.com/GiulioRossetti/RDyn/blob/master/README.md))  
+- We use RDyn to generate the synthetic dynamic networks. [RDyn: graph benchmark handling community dynamics.](https://github.com/GiulioRossetti/RDyn/blob/master/README.md)
 
-- We use # xmeasures to evaluate the performance of the community detection results. [xmeasures - Extrinsic Clustering Measures] ([https://github.com/eXascaleInfolab/xmeasures](https://github.com/eXascaleInfolab/xmeasures))  
+- We use # xmeasures to evaluate the performance of the community detection results. [xmeasures - Extrinsic Clustering Measures](https://github.com/eXascaleInfolab/xmeasures)
 
 #### Quick Start (only tested using Eclipse on Ubuntu, JDK8)  
 
