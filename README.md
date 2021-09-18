@@ -7,9 +7,9 @@
 - The necessary implementations for our experiments on the real-world dynamic networks is in real_world_network_exp.java. The real-world dynamic network datasets will be added soon.  
 
 #### Requirements
-- We use RDyn to generate the synthetic dynamic networks. [RDyn: graph benchmark handling community dynamics.](https://github.com/GiulioRossetti/RDyn/blob/master/README.md)
+- We use [RDyn](https://github.com/GiulioRossetti/RDyn/blob/master/README.md) to generate the synthetic dynamic networks.
 
-- We use # xmeasures to evaluate the performance of the community detection results. [xmeasures - Extrinsic Clustering Measures](https://github.com/eXascaleInfolab/xmeasures)
+- We use [xmeasures](https://github.com/eXascaleInfolab/xmeasures) to evaluate the performance of the community detection results.
 
 #### Quick Start (only tested using Eclipse on Ubuntu, JDK8)  
 
@@ -18,7 +18,7 @@
 - Go to the folder ./xmeasures-master and build xmeasures using ```make release```.
 - If you are using Python 2.7, nothing need to be changed. If you are using Python 3.XX, changing ``python RDyn-master/rdyn`` in synthetic_exp_1.java and synthetic_exp_2.java to ``python3 RDyn-master/rdyn``.
 - Run synthetic_exp_1.java and synthetic_exp_2.java for the synthetic dynamic network experiments.
-- Run real_world_network_exp.java for the real-world dynamic network experiments. [download the dataset:] ([https://www.kaggle.com/nogrady/realworld-dynamic-networks-dynamo](https://www.kaggle.com/nogrady/realworld-dynamic-networks-dynamo))  
+- Run real_world_network_exp.java for [the real-world dynamic network](https://www.kaggle.com/nogrady/realworld-dynamic-networks-dynamo) experiments.  
 
 
 
